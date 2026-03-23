@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NeuralSpace — Second Brain
+
+A next-generation productivity and knowledge system built for finance, quantitative research, and deep work.
+
+## Features
+
+- **Knowledge Rooms** — Immersive domain-based workspaces replacing traditional folders
+- **Note Editor** — Markdown, LaTeX (KaTeX), tag system, code blocks
+- **Knowledge Graph** — Interactive D3 force-directed graph with Insight Mode
+- **Finance Dashboard** — Watchlist, portfolio chart, macro indicators, strategy journal
+- **AI Think Mode** — Expand ideas, auto-link concepts, generate flashcards
+- **Task Management** — Priority filtering, room grouping, progress tracking
+- **Deep Work Mode** — Pomodoro overlay with ambient sound options
+- **Command Bar** — `Ctrl+K` global navigation
+
+## Tech Stack
+
+- [Next.js 14](https://nextjs.org) — App Router, TypeScript
+- [Tailwind CSS](https://tailwindcss.com) — Dark-mode glassmorphism UI
+- [Framer Motion](https://www.framer-motion.com) — Smooth animations
+- [D3.js](https://d3js.org) — Knowledge graph visualization
+- [Recharts](https://recharts.org) — Finance charts
+- [Zustand](https://zustand-demo.pmnd.rs) — State management
+- [Inter](https://rsms.me/inter/) — Typography via `next/font/google`
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploy instantly on [Vercel](https://vercel.com/new).

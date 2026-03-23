@@ -27,13 +27,15 @@ const strategies = [
 ];
 
 function generatePortfolioData() {
+  const PORTFOLIO_DRIFT_BIAS = 0.45;
+  const PORTFOLIO_VOLATILITY_FACTOR = 0.012;
   const data = [];
   let value = 100000;
   const today = new Date();
   for (let i = 29; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    value = value * (1 + (Math.random() - 0.45) * 0.012);
+    value = value * (1 + (Math.random() - PORTFOLIO_DRIFT_BIAS) * PORTFOLIO_VOLATILITY_FACTOR);
     data.push({
       date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       value: Math.round(value),

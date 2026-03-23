@@ -16,7 +16,7 @@ interface SimLink extends d3.SimulationLinkDatum<SimNode> {
   target: string | SimNode;
 }
 
-const MAX_NOTE_LABEL_LENGTH = 20;
+const MAX_GRAPH_NOTE_LABEL_LENGTH = 20;
 
 export function KnowledgeGraph() {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -111,7 +111,7 @@ export function KnowledgeGraph() {
       .selectAll('text')
       .data(nodes)
       .join('text')
-      .text((d) => d.type === 'room' ? d.label : d.label.slice(0, MAX_NOTE_LABEL_LENGTH) + (d.label.length > MAX_NOTE_LABEL_LENGTH ? '…' : ''))
+      .text((d) => d.type === 'room' ? d.label : d.label.slice(0, MAX_GRAPH_NOTE_LABEL_LENGTH) + (d.label.length > MAX_GRAPH_NOTE_LABEL_LENGTH ? '…' : ''))
       .attr('fill', (d) => d.type === 'room' ? d.color : 'rgba(255,255,255,0.6)')
       .attr('font-size', (d) => d.type === 'room' ? '12px' : '9px')
       .attr('font-weight', (d) => d.type === 'room' ? '600' : '400')

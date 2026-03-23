@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import { Room, Note, Task, ViewType } from './types';
 
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
 interface AppState {
   rooms: Room[];
   notes: Note[];
@@ -157,7 +164,7 @@ export const useStore = create<AppState>((set) => ({
   addRoom: (room) => set((state) => ({
     rooms: [...state.rooms, {
       ...room,
-      id: crypto.randomUUID(),
+      id: generateId(),
       notes: [],
       tasks: [],
       createdAt: new Date().toISOString(),
@@ -167,7 +174,7 @@ export const useStore = create<AppState>((set) => ({
   addNote: (note) => set((state) => ({
     notes: [...state.notes, {
       ...note,
-      id: crypto.randomUUID(),
+      id: generateId(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }],
@@ -175,7 +182,7 @@ export const useStore = create<AppState>((set) => ({
   addTask: (task) => set((state) => ({
     tasks: [...state.tasks, {
       ...task,
-      id: crypto.randomUUID(),
+      id: generateId(),
       createdAt: new Date().toISOString(),
     }],
   })),
