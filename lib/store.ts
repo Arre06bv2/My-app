@@ -1,11 +1,24 @@
 import { create } from 'zustand';
-import { Room, Note, Task, ViewType } from './types';
+import { Room, Note, Task, ViewType, MascotMood } from './types';
 
 function generateId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getLevelName(level: number): string {
+  if (level < 2) return 'Novice';
+  if (level < 4) return 'Learner';
+  if (level < 7) return 'Scholar';
+  if (level < 11) return 'Expert';
+  return 'Master';
+}
+
+function calcLevel(xp: number): number {
+  // 100 XP per level, increasing threshold
+  return Math.floor(Math.sqrt(xp / 50));
 }
 
 interface AppState {
@@ -17,6 +30,12 @@ interface AppState {
   selectedNote: string | null;
   isDeepWorkMode: boolean;
   commandBarOpen: boolean;
+  xp: number;
+  level: number;
+  streak: number;
+  lastActiveDate: string | null;
+  mascotMessage: string | null;
+  mascotMood: MascotMood;
   setCurrentView: (view: ViewType) => void;
   setSelectedRoom: (id: string | null) => void;
   setSelectedNote: (id: string | null) => void;
@@ -27,6 +46,12 @@ interface AppState {
   toggleDeepWork: () => void;
   toggleCommandBar: () => void;
   updateNote: (id: string, updates: Partial<Note>) => void;
+  deleteNote: (id: string) => void;
+  deleteRoom: (id: string) => void;
+  deleteTask: (id: string) => void;
+  awardXP: (amount: number, message?: string, mood?: MascotMood) => void;
+  setMascotMessage: (message: string | null, mood?: MascotMood) => void;
+  checkStreak: () => void;
 }
 
 const sampleNotes: Note[] = [
