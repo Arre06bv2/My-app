@@ -8,7 +8,7 @@ function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
 
-function getLevelName(level: number): string {
+export function getLevelName(level: number): string {
   if (level < 2) return 'Novice';
   if (level < 4) return 'Learner';
   if (level < 7) return 'Scholar';
@@ -183,40 +183,108 @@ export const useStore = create<AppState>((set) => ({
   selectedNote: null,
   isDeepWorkMode: false,
   commandBarOpen: false,
+  xp: 0,
+  level: 0,
+  streak: 0,
+  lastActiveDate: null,
+  mascotMessage: null,
+  mascotMood: 'idle',
   setCurrentView: (view) => set({ currentView: view }),
   setSelectedRoom: (id) => set({ selectedRoom: id }),
   setSelectedNote: (id) => set({ selectedNote: id }),
-  addRoom: (room) => set((state) => ({
-    rooms: [...state.rooms, {
-      ...room,
-      id: generateId(),
-      notes: [],
-      tasks: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }],
-  })),
-  addNote: (note) => set((state) => ({
-    notes: [...state.notes, {
-      ...note,
-      id: generateId(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }],
-  })),
-  addTask: (task) => set((state) => ({
-    tasks: [...state.tasks, {
-      ...task,
-      id: generateId(),
-      createdAt: new Date().toISOString(),
-    }],
-  })),
-  toggleTask: (id) => set((state) => ({
-    tasks: state.tasks.map((t) => t.id === id ? { ...t, completed: !t.completed } : t),
-  })),
+  addRoom: (room) => set((state) => {
+    const newXp = state.xp + 10;
+    return {
+      rooms: [...state.rooms, {
+        ...room,
+        id: generateId(),
+        notes: [],
+        tasks: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }],
+      xp: newXp,
+      level: calcLevel(newXp),
+      mascotMessage: 'New room created! +10 XP 🏠',
+      mascotMood: 'celebrating' as MascotMood,
+    };
+  }),
+  addNote: (note) => set((state) => {
+    const newXp = state.xp + 15;
+    return {
+      notes: [...state.notes, {
+        ...note,
+        id: generateId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }],
+      xp: newXp,
+      level: calcLevel(newXp),
+      mascotMessage: 'Note captured! +15 XP 📝',
+      mascotMood: 'celebrating' as MascotMood,
+    };
+  }),
+  addTask: (task) => set((state) => {
+    const newXp = state.xp + 5;
+    return {
+      tasks: [...state.tasks, {
+        ...task,
+        id: generateId(),
+        createdAt: new Date().toISOString(),
+      }],
+      xp: newXp,
+      level: calcLevel(newXp),
+      mascotMessage: 'Task added! +5 XP ✅',
+      mascotMood: 'encouraging' as MascotMood,
+    };
+  }),
+  toggleTask: (id) => set((state) => {
+    const task = state.tasks.find((t) => t.id === id);
+    const wasCompleted = task?.completed ?? false;
+    if (!wasCompleted) {
+      const newXp = state.xp + 20;
+      return {
+        tasks: state.tasks.map((t) => t.id === id ? { ...t, completed: true } : t),
+        xp: newXp,
+        level: calcLevel(newXp),
+        mascotMessage: 'Task crushed! +20 XP 🎉',
+        mascotMood: 'celebrating' as MascotMood,
+      };
+    }
+    return { tasks: state.tasks.map((t) => t.id === id ? { ...t, completed: false } : t) };
+  }),
   toggleDeepWork: () => set((state) => ({ isDeepWorkMode: !state.isDeepWorkMode })),
   toggleCommandBar: () => set((state) => ({ commandBarOpen: !state.commandBarOpen })),
   updateNote: (id, updates) => set((state) => ({
     notes: state.notes.map((n) => n.id === id ? { ...n, ...updates, updatedAt: new Date().toISOString() } : n),
   })),
+  deleteNote: (id) => set((state) => ({
+    notes: state.notes.filter((n) => n.id !== id),
+  })),
+  deleteRoom: (id) => set((state) => ({
+    rooms: state.rooms.filter((r) => r.id !== id),
+  })),
+  deleteTask: (id) => set((state) => ({
+    tasks: state.tasks.filter((t) => t.id !== id),
+  })),
+  awardXP: (amount, message, mood = 'celebrating') => set((state) => {
+    const newXp = state.xp + amount;
+    return {
+      xp: newXp,
+      level: calcLevel(newXp),
+      mascotMessage: message ?? `+${amount} XP!`,
+      mascotMood: mood,
+    };
+  }),
+  setMascotMessage: (message, mood = 'idle') => set({
+    mascotMessage: message,
+    mascotMood: mood,
+  }),
+  checkStreak: () => set((state) => {
+    const today = new Date().toDateString();
+    if (state.lastActiveDate === today) return {};
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    const newStreak = state.lastActiveDate === yesterday ? state.streak + 1 : 1;
+    return { streak: newStreak, lastActiveDate: today };
+  }),
 }));
