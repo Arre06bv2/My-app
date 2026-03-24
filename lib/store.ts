@@ -174,7 +174,7 @@ const sampleRooms: Room[] = [
   },
 ];
 
-export const useStore = create<AppState>((set) => ({
+export const useStore = create<AppState>((set, get) => ({
   rooms: sampleRooms,
   notes: sampleNotes,
   tasks: sampleTasks,
@@ -183,6 +183,12 @@ export const useStore = create<AppState>((set) => ({
   selectedNote: null,
   isDeepWorkMode: false,
   commandBarOpen: false,
+  xp: 120,
+  level: calcLevel(120),
+  streak: 3,
+  lastActiveDate: new Date(Date.now() - 86400000).toISOString().slice(0, 10),
+  mascotMessage: null,
+  mascotMood: 'idle',
   setCurrentView: (view) => set({ currentView: view }),
   setSelectedRoom: (id) => set({ selectedRoom: id }),
   setSelectedNote: (id) => set({ selectedNote: id }),
@@ -219,4 +225,55 @@ export const useStore = create<AppState>((set) => ({
   updateNote: (id, updates) => set((state) => ({
     notes: state.notes.map((n) => n.id === id ? { ...n, ...updates, updatedAt: new Date().toISOString() } : n),
   })),
+  deleteNote: (id) => set((state) => ({
+    notes: state.notes.filter((n) => n.id !== id),
+    rooms: state.rooms.map((r) => ({ ...r, notes: r.notes.filter((nid) => nid !== id) })),
+    selectedNote: state.selectedNote === id ? null : state.selectedNote,
+  })),
+  deleteRoom: (id) => set((state) => ({
+    rooms: state.rooms.filter((r) => r.id !== id),
+    notes: state.notes.filter((n) => n.roomId !== id),
+    tasks: state.tasks.filter((t) => t.roomId !== id),
+    selectedRoom: state.selectedRoom === id ? null : state.selectedRoom,
+  })),
+  deleteTask: (id) => set((state) => ({
+    tasks: state.tasks.filter((t) => t.id !== id),
+    rooms: state.rooms.map((r) => ({ ...r, tasks: r.tasks.filter((tid) => tid !== id) })),
+  })),
+  awardXP: (amount, message, mood) => set((state) => {
+    const newXP = state.xp + amount;
+    const newLevel = calcLevel(newXP);
+    const leveledUp = newLevel > state.level;
+    return {
+      xp: newXP,
+      level: newLevel,
+      mascotMessage: leveledUp
+        ? `Level up! You're now a ${getLevelName(newLevel)}! 🎉`
+        : (message ?? null),
+      mascotMood: leveledUp ? 'celebrating' : (mood ?? 'encouraging'),
+    };
+  }),
+  setMascotMessage: (message, mood) => set({
+    mascotMessage: message,
+    mascotMood: mood ?? (message ? 'idle' : 'idle'),
+  }),
+  checkStreak: () => set((state) => {
+    const today = new Date().toISOString().slice(0, 10);
+    const last = state.lastActiveDate;
+    if (last === today) return {};
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const newStreak = last === yesterday ? state.streak + 1 : 1;
+    const streakMsg = newStreak > 1
+      ? `${newStreak}-day streak! Keep it up! 🔥`
+      : "Welcome back! Let's build something great.";
+    return {
+      streak: newStreak,
+      lastActiveDate: today,
+      mascotMessage: streakMsg,
+      mascotMood: newStreak > 1 ? 'celebrating' : 'encouraging',
+    };
+  }),
 }));
+
+// Expose calcLevel and getLevelName for components
+export { calcLevel, getLevelName };
